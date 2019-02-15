@@ -41,6 +41,7 @@ namespace RELI{
 	#define BedSigFastaDir ""
 
 	extern vector<string> linehandler(string);
+
 	//classes 
 	class phastConData{
 	public:
@@ -58,6 +59,7 @@ namespace RELI{
 			return  (this->chr == rhs.chr && this->st == rhs.st && this->end == rhs.end);
 		}
 	};
+
 	class bed3col{  
 	public:
 		string bed_chr;
@@ -75,23 +77,8 @@ namespace RELI{
 		vector<double> ez_phastCon_score_vec;
 		vector<double> ez_phastCon_score_vec_padding_50bp; 
 	};
-	class target_bed_file{
-	public:
-		vector<unsigned int> lengthvec;
-		vector<bed3col> myData;
-		vector<bed3col> myData_bgnull;
-		map<string, int> index;
-		map<pair<string, unsigned int>, int> index2;	
-		void makeIndex();
-		void makeIndex2();
-		void readingData(string, bool);
-		unsigned int median_data_length;
-		vector<double> phastCon_score_vec_from_peaks;
-		double avg_phastCons_score;
-		double sd_phastCons_score;
-		void cal_avg_phastCons_score();
-	};
-	class SNP{  
+
+	class SNP{
 	public:
 		unsigned int inherited_unique_key_from_LD;
 		string snp_chr;
@@ -132,40 +119,7 @@ namespace RELI{
 			return (this->snp_name == rhs);
 		}
 	};
-	class LD_template{  
-	public:
-		vector<string> mySNP;
-		string keySNP;
-	};
-	class LD{   
-	public:
-		vector<SNP> mySNP;
-		SNP keySNP;
-		vector<int> dis2keySNP;
-		int max_dis;
-		int min_dis;
-		// for goshifter
-		string LD_chr;
-		int LD_left_edge;
-		int LD_right_edge;
-		LD() :max_dis(0), min_dis(0){};
-		target_bed_file features_within_LDblock;
-		void get_features_within_LDblock(const target_bed_file& rhs);
-		vector<bed3col> goShifting_feature_data();
-	};
-	class LD_sim :public LD{   
-	public:
-		bool overlap_sim;
-		unsigned int unique_key;
-	};
-	class LD_shomo_method :public LD{
-	public:
-		unsigned int extended_LD_start;
-		unsigned int extended_LD_end;
-		vector<bed3col> intersected_peaks;
 
-		bool overlap_sim;
-	};
 	class myless{
 	public:
 		bool operator()(SNP snpA, SNP snpB) const {
@@ -173,6 +127,7 @@ namespace RELI{
 				|| ((snpA.snp_name == snpB.snp_name) && (snpA.snp_chr == snpB.snp_chr) && (snpA.snp_start < snpB.snp_start)));
 		}
 	};
+
 	class mymap :public map < string, string > {
 	public:
 		static iterator find2(iterator _it1, iterator _it2, string _val){
@@ -184,7 +139,8 @@ namespace RELI{
 			return _it2;
 		}
 	};
-	class MAF_binned_null_model{
+
+	class MafBinnedNullModel{
 	public:
 		vector<unsigned int> bin0;	//0 - 5%
 		vector<unsigned int> bin1;	//5 - 10%
@@ -197,7 +153,20 @@ namespace RELI{
 		vector<unsigned int> bin8;	//40 - 45%
 		vector<unsigned int> bin9;	//45 - 50%
 		map<int, vector<unsigned int>*> bin_map;
-		MAF_binned_null_model(){
+		MafBinnedNullModel(const string &path){
+			bin_map[0] = &bin0;
+			bin_map[1] = &bin1;
+			bin_map[2] = &bin2;
+			bin_map[3] = &bin3;
+			bin_map[4] = &bin4;
+			bin_map[5] = &bin5;
+			bin_map[6] = &bin6;
+			bin_map[7] = &bin7;
+			bin_map[8] = &bin8;
+			bin_map[9] = &bin9;
+			load_data(path);
+		}
+		MafBinnedNullModel(){
 			bin_map[0] = &bin0;
 			bin_map[1] = &bin1;
 			bin_map[2] = &bin2;
@@ -209,12 +178,76 @@ namespace RELI{
 			bin_map[8] = &bin8;
 			bin_map[9] = &bin9;
 		}
-		void loading_null_data(string);
+		void load_data(string rhs);
 	};
+
+
+	class TargetBedFile{
+	public:
+		vector<unsigned int> lengthvec;
+		vector<bed3col> myData;
+		vector<bed3col> myData_bgnull;
+		map<string, int> index;
+		MafBinnedNullModel null_model_data;
+		map<pair<string, unsigned int>, int> index2;
+		void makeIndex();
+		void makeIndex2();
+		void load_data(string, bool);
+		unsigned int median_data_length;
+		vector<double> phastCon_score_vec_from_peaks;
+		double avg_phastCons_score;
+		double sd_phastCons_score;
+		void cal_avg_phastCons_score();
+		TargetBedFile(const string &path, const MafBinnedNullModel &null_model){
+			null_model_data = null_model;
+			load_data(path, false);
+		};
+		TargetBedFile(){};
+	};
+
+	class LD{
+	public:
+		vector<SNP> mySNP;
+		SNP keySNP;
+		vector<int> dis2keySNP;
+		int max_dis;
+		int min_dis;
+		// for goshifter
+		string LD_chr;
+		int LD_left_edge;
+		int LD_right_edge;
+		LD() :max_dis(0), min_dis(0){};
+		TargetBedFile features_within_LDblock;
+		void get_features_within_LDblock(const TargetBedFile& rhs);
+		vector<bed3col> goShifting_feature_data();
+	};
+
+	class LD_template{
+	public:
+		vector<string> mySNP;
+		string keySNP;
+	};
+
+	class LD_sim :public LD{
+	public:
+		bool overlap_sim;
+		unsigned int unique_key;
+	};
+
+	class LD_shomo_method :public LD{
+	public:
+		unsigned int extended_LD_start;
+		unsigned int extended_LD_end;
+		vector<bed3col> intersected_peaks;
+
+		bool overlap_sim;
+	};
+
 	class MAF_TSS_binned_null_model{
 	public:
 		map<pair<int, int>, vector<unsigned int>> bin_map;
 	};
+
 	class resultClass{	
 	public:
 		string resultLine;
@@ -256,6 +289,7 @@ namespace RELI{
 			return this->datalabel == rhs;
 		}
 	};
+
 	class snp_table_data{public:
 		string chr;
 		string start;
@@ -269,17 +303,11 @@ namespace RELI{
 		string alt_allele_freq;
 		string bin;
 	};
+
 	class RELIobj{public:
 		static const int lcsize = 500000000;
 		char linechar[lcsize];
 		string line; 
-		string dnaSeqReverse(string inSeq, map<char, char> thismap){
-			string tempseq;
-			for (string::reverse_iterator sit = inSeq.rbegin(); sit != inSeq.rend(); ++sit){
-				tempseq += thismap[*sit];
-			}
-			return tempseq;
-		}
 		map<char, char> ATGCmap;
 
 		/*
@@ -325,11 +353,6 @@ namespace RELI{
 		void public_ver_read_snp_table(); 
 		void create_output_dir();
 		void load_snp_table();
-		void extract_snp_info(map<char,char>);
-		void load_ld_snps(bool, string);
-		void output();
-		void sim();
-
 		bool minimum_check();
 
 		// constructor
@@ -354,7 +377,13 @@ namespace RELI{
             this->flag_output_prefix = false;
 		}
 	};
-	//variables  
+
+
+
+
+
+
+	//variables
 	enum stats_model{ normal, empirical, phasetype, binomial, hypergeometric, fishers_exact }; 
 	// external variables 
 	extern vector<SNP> SNP_vec; 	
@@ -401,8 +430,7 @@ namespace RELI{
 	extern map<SNP, LD_sim, myless> snp2ldsim;
 	extern mymap speciesMap;
 	extern stats_model used_stats_model;
-	extern MAF_binned_null_model binned_null_model_data;
-	extern MAF_binned_null_model bg_null_model_data;
+	extern MafBinnedNullModel binned_null_model_data;
 	extern MAF_TSS_binned_null_model binned_null_model_data2;
 	extern unordered_map<string, vector<unsigned int>> indexing_mapping;
 	bool SNPfit(LD, SNP &, unsigned int, vector<pair<string, unsigned int>>, vector<unsigned int>);
@@ -423,9 +451,9 @@ namespace RELI{
 	void overlapping2(vector<SNP>, vector<bed3col>);
 	void overlapping3(vector<SNP>, vector<bed3col>, vector<unsigned int>&);
 	void overlapping_w_index(vector<SNP>, vector<bed3col>, vector<unsigned int>&, map<string, int>);
-	void createSpeciesMap(bool);
-	void cal_stats(stats_model);
-	void read_ld_file(string);
+	void createSpeciesMap();
+	void cal_stats(RELI::stats_model inModel, const vector<double> &collected_statistics_vector);
+	vector<LD_template> read_ld_file(const string path);
 	void ReadBedSigResult(string, vector<RELI::resultClass>&, bool &);
 	void ReadTFMapping(string, map<string, string>&);
 	void initiate_BedSig();
@@ -434,7 +462,13 @@ namespace RELI{
 	int binomialCoeff(int, int);
 	double binomial_pvalue(int, int, double);
 	double binomial_pvalue_appr(int, int, double);
-	void loadSnpFile(string);
+	vector<SNP> loadSnpFile(const string &path);
+	void extract_snp_info(map<char,char> rhs, vector<SNP> &snp_vector, unordered_map<string, RELI::snp_table_data> &snp_table);
+	vector<LD> load_ld_snps(bool match, string ld_path, vector<SNP> &snp_vector_temp);
+	vector<double> sim(MafBinnedNullModel null_model, const vector<LD> &ld_vector, bool match);
+	void output(const string &path, const vector<double> &collected_statistics_vector, const vector<LD> &ld_vector);
+	string dnaSeqReverse(string inSeq, map<char, char> thismap);
+	unordered_map<string, snp_table_data> load_snp_table(const string &path);
 }
 // end of RELI namespace  
 
