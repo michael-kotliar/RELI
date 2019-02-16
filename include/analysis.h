@@ -2,8 +2,8 @@
 // Created by kot4or on 2/14/19.
 //
 
-#ifndef RELI_ANALYSIS_H
-#define RELI_ANALYSIS_H
+#ifndef ANALYSIS_H
+#define ANALYSIS_H
 
 #include <iostream>
 #include <fstream>
@@ -40,4 +40,4 @@ inline vector<unsigned int> get_chr_length_accumulated (const vector<pair<string
 
 
 
-#endif //RELI_ANALYSIS_H
+#endif

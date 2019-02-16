@@ -24,7 +24,7 @@
 #include <random>
 #include <assert.h>
 #include <unistd.h>
-#include "RELI_impl.h"
+#include "reli.h"
 #include "utils.h"
 #include <sys/stat.h> // for mkdir and mkdirat (requires kernel >= 2.6.16)
 #include <fcntl.h>    // for AT_FDCWD
@@ -1035,12 +1035,7 @@ void MafBinnedNullModel::load_data(string rhs){
 	ifstream in;
 	nullmodelinfilename = rhs;
 	in.open(nullmodelinfilename.c_str());
-	if (!in){
-		cerr << "cannot load selected null model, check with option -null : "
-		     << nullmodelinfilename << endl;
-		exit(-1);
-	}
-	if (!RELI::snp_matching){	
+	if (!RELI::snp_matching){
 		in.ignore(bufferSize, '\n');
 	}
 	while (!in.eof()){

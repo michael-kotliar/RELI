@@ -1,5 +1,6 @@
-#ifndef RELI_impl_h
-#define RELI_impl_h
+#ifndef RELI_H
+#define RELI_H
+
 #include <thread>            
 #include <mutex>               
 #include <condition_variable>  
@@ -470,9 +471,5 @@ namespace RELI{
 	string dnaSeqReverse(string inSeq, map<char, char> thismap);
 	unordered_map<string, snp_table_data> load_snp_table(const string &path);
 }
-// end of RELI namespace  
-
-
-
 
 #endif

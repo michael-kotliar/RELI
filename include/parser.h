@@ -1,8 +1,8 @@
 //
 // Created by kot4or on 2/14/19.
 
-#ifndef RELI_PARSER_H
-#define RELI_PARSER_H
+#ifndef PARSER_H
+#define PARSER_H
 
 #include <iostream>
 #include "cxxopts.hpp"
@@ -28,4 +28,4 @@ public:
     void print_conf();
 };
 
-#endif //RELI_PARSER_H
+#endif
