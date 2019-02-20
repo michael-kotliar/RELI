@@ -143,7 +143,7 @@ snptable get_snp_table(const string &path){
 
 
 void assign_bins(BedData &snp_bed_data, const snptable &snp_table){
-    cout << "Assign bins" << endl;
+    cout << "Assigning bins" << endl;
     atgc atgcmap;
     for (auto &bed4_line_it : snp_bed_data.bed_vector){
         auto snp_table_line_iter = snp_table.find(bed4_line_it.name);  // What to do with the snp that are not present in snp_table
@@ -153,6 +153,7 @@ void assign_bins(BedData &snp_bed_data, const snptable &snp_table){
             bed4_line_it.bin = get_bin(alt_allele_freq.back());
         }
     }
+    cout << " - done" << endl;
 }
 
 
@@ -283,7 +284,7 @@ hits sim(int permutation, const lddata &ld_data, const NullModel &null_model, co
     hits collected_hits;
     default_random_engine random_seed(chrono::system_clock::now().time_since_epoch().count());
     for (int current_iteration = 0; current_iteration < permutation; current_iteration++){
-        cout << "   " << current_iteration + 1 << "/" << permutation << endl;
+//        cout << "   " << current_iteration + 1 << "/" << permutation << endl;
         lddata simulation_ld_data;
         if (current_iteration == 0){
             simulation_ld_data = ld_data;
