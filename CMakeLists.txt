@@ -10,14 +10,13 @@ find_package(GSL REQUIRED)
 include_directories (include)
 
 set(SOURCE_FILES
-        include/reli.h
-        src/reli.cpp
         include/parser.h
         src/parser.cpp
         include/cxxopts.hpp
         include/utils.h
         src/main.cpp
-        include/analysis.h)
+        include/analysis.h
+        src/analysis.cpp)
 
 add_executable(RELI ${SOURCE_FILES})
 target_link_libraries(RELI GSL::gsl)

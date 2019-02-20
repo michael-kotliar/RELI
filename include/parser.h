@@ -11,15 +11,14 @@ using namespace std;
 
 class Parser {
 public:
-    vector<string> snp_filenames;
-    vector<string> ld_filenames;
-    string target_filename;
-    string chrlength_filename;
-    string nullmodel_filename;
-    string dbsnp_filename;
-    string output_dir;
-    string output_prefix;
-    bool match;
+    vector<string> snps;
+    vector<string> lds;
+    string target;
+    string chr_length;
+    string null_model;
+    string dbsnp;
+    string out_dir;
+    string out_prefix;
     int permutation;
     int corr_coef;
     string phenotype_name;
