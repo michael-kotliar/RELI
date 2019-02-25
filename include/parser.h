@@ -20,9 +20,7 @@ public:
     string out_dir;
     string out_prefix;
     int permutation;
-    int corr_coef;
-    string phenotype_name;
-    string ancestry_name;
+    double corr_coef;
     Parser (int argc, char * argv[]);
     void print_conf();
 };

@@ -17,9 +17,7 @@ Parser::Parser (int argc, char * argv[]){
         ("out",       "Output directory",              cxxopts::value<string>()->default_value("./results"))
         ("prefix",    "Output prefix",                 cxxopts::value<string>()->default_value("reli"))
         ("rep",       "Permutation number",            cxxopts::value<int>()->default_value("2000"))
-        ("corr",      "Correction multiplier",         cxxopts::value<float>()->default_value("1"))
-        ("phenotype", "Phenotype name",                cxxopts::value<string>()->default_value("."))
-        ("ancestry",  "Ancestry name",                 cxxopts::value<string>()->default_value("."));
+        ("corr",      "Correction multiplier",         cxxopts::value<float>()->default_value("1"));
 
     opt_parser.parse(argc, argv);
 
@@ -33,8 +31,6 @@ Parser::Parser (int argc, char * argv[]){
     out_prefix = opt_parser["prefix"].as<string>();
     permutation = opt_parser["rep"].as<int>();
     corr_coef = opt_parser["corr"].as<float>();
-    phenotype_name = opt_parser["phenotype"].as<string>();
-    ancestry_name = opt_parser["ancestry"].as<string>();
 
 
 }
@@ -53,6 +49,4 @@ void Parser::print_conf(){
     cout << "--prefix " <<out_prefix << endl;
     cout << "--permutation " <<permutation << endl;
     cout << "--corr " <<corr_coef << endl;
-    cout << "--phenotype " <<phenotype_name << endl;
-    cout << "--ancestry " <<ancestry_name << endl;
 }
