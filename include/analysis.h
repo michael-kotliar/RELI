@@ -14,6 +14,7 @@
 #include <map>
 #include <gsl/gsl_cdf.h>
 #include <random>
+#include <iomanip>
 #include <utils.h>
 
 
@@ -114,8 +115,8 @@ struct statistics {
 
 
 
-typedef vector<pair<string, unsigned long> > genome;
-typedef vector<unsigned long> genomesum;
+typedef vector<pair<string, unsigned long> > genomelength;
+typedef vector<unsigned long> genomelengthsum;
 typedef vector<unsigned long> bin_vector;
 typedef unordered_map<string, snpline> snptable;
 typedef vector<int> hits;
@@ -151,12 +152,12 @@ public:
 typedef vector<LdRecord> lddata;
 
 
-genome get_genome_structure(const string &path);
-genomesum get_genome_sum(const genome &genome_structure);
+genomelength get_genome_length(const string &path);
+genomelengthsum get_genome_length_sum(const genomelength &genome_structure);
 snptable get_snp_table(const string &path);
 lddata get_ld_data(const string &path, const BedData &snp_bed_data);
-bool fit_snp (const LdRecord &ld_record, bed4 &temp_snp, const unsigned long &bin, const genome &genome_structure, const genomesum &genome_sum);
-hits sim(int permutation, const lddata &ld_data, const NullModel &null_model, const genome &genome_structure, const genomesum &genome_sum, const BedData &target_bed_data);
+bool fit_snp (const LdRecord &ld_record, bed4 &temp_snp, const unsigned long &bin, const genomelength &genome_structure, const genomelengthsum &genome_sum);
+hits sim(int permutation, const lddata &ld_data, const NullModel &null_model, const genomelength &genome_structure, const genomelengthsum &genome_sum, const BedData &target_bed_data);
 set<int> get_unique_overlaps(vector<bed4> temp_snp_vector, const BedData &target_bed_data);
 bool is_overlap(const bed4 &alpha, const bed4 &beta);
 void assign_bins(BedData &snp_bed_data, const snptable &snp_table);

@@ -12,10 +12,8 @@ int main(int argc, char* argv[]){
 
 	Parser custom_parser = Parser(argc, argv);
 
-    create_directory(custom_parser.out_dir);
-
-    genome genome_structure = get_genome_structure(custom_parser.chr_length);
-    genomesum genome_sum = get_genome_sum(genome_structure);
+    genomelength genome_length = get_genome_length(custom_parser.chr_length);
+    genomelengthsum genome_length_sum = get_genome_length_sum(genome_length);
     snptable snp_table = get_snp_table(custom_parser.dbsnp);
 
     NullModel null_model(custom_parser.null_model);
@@ -30,7 +28,7 @@ int main(int argc, char* argv[]){
         BedData snp_bed_data(snp_file);
         assign_bins(snp_bed_data, snp_table);
         lddata ld_data = get_ld_data(ld_file, snp_bed_data);
-        hits collected_hits = sim(custom_parser.permutation, ld_data, null_model, genome_structure, genome_sum, target_bed_data);
+        hits collected_hits = sim(custom_parser.permutation, ld_data, null_model, genome_length, genome_length_sum, target_bed_data);
         statistics stats = get_statistics(collected_hits, ld_data, custom_parser.corr_coef, snp_file);
         collected_statistics.push_back(stats);
     }

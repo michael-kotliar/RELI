@@ -101,30 +101,32 @@ void BedData::load(const string &path){
 }
 
 
-genome get_genome_structure(const string &path){
-    cout << "Loading genome structure from " << path << endl;
+genomelength get_genome_length(const string &path){
+    cout << "Loading genome length from " << path << endl;
     ifstream input_stream(path);
-    genome genome_structure;
+    genomelength genome_length;
     string line;
     while(getline(input_stream, line)) {
         vector<string> values = split_by_delim(line);
         pair<string, unsigned long> chr_data (values[0], strtoul(values[1].c_str(), NULL, 0));
-        genome_structure.push_back(chr_data);
+        genome_length.push_back(chr_data);
     }
     cout << "- done" << endl;
-    return genome_structure;
+    return genome_length;
 }
 
 
-genomesum get_genome_sum(const genome &genome_structure){
-    cout << "Calculating genome structure sum" << endl;
-    genomesum genome_sum;
-    genome_sum.push_back(0);
+genomelengthsum get_genome_length_sum(const genomelength &genome_structure){
+    cout << "Calculating genome length sum" << endl;
+    genomelengthsum genome_length_sum;
+    genome_length_sum.push_back(0);
+    cout << setw(27) << " | " << genome_length_sum.back() << endl;
     for (int i = 0; i < genome_structure.size(); i++){
-        genome_sum.push_back(genome_sum.back() + genome_structure[i].second);
+        genome_length_sum.push_back(genome_length_sum.back() + genome_structure[i].second);
+        cout << setw(5) << genome_structure[i].first << ": " << setw(10) << genome_structure[i].second << setw(10) << " | " << genome_length_sum.back() << endl;
     }
     cout << "- done" << endl;
-    return genome_sum;
+    return genome_length_sum;
 }
 
 
@@ -202,7 +204,7 @@ lddata get_ld_data(const string &path, const BedData &snp_bed_data){
 }
 
 
-bool fit_snp (const LdRecord &ld_record, bed4 &temp_snp, const unsigned long &bin, const genome &genome_structure, const genomesum &genome_sum){
+bool fit_snp (const LdRecord &ld_record, bed4 &temp_snp, const unsigned long &bin, const genomelength &genome_structure, const genomelengthsum &genome_sum){
 
     int max_diff; // Maybe should be unsigned long?
     for (int i = 0; i < ld_record.distance_to_key_snp.size(); i++){
@@ -279,7 +281,7 @@ set<int> get_unique_overlaps(vector<bed4> temp_snp_vector, const BedData &target
 }
 
 
-hits sim(int permutation, const lddata &ld_data, const NullModel &null_model, const genome &genome_structure, const genomesum &genome_sum, const BedData &target_bed_data){
+hits sim(int permutation, const lddata &ld_data, const NullModel &null_model, const genomelength &genome_structure, const genomelengthsum &genome_sum, const BedData &target_bed_data){
     cout << "Running simulation" << endl;
     hits collected_hits;
     default_random_engine random_seed(chrono::system_clock::now().time_since_epoch().count());
@@ -355,6 +357,7 @@ statistics get_statistics(const hits &collected_hits, const lddata &ld_data, con
 }
 
 void export_results(const vector<statistics> &collected_statistics, const string &out_dir, const string &out_prefix){
+    create_directory(out_dir);
     string path = out_dir + "/" + out_prefix + ".reli";
     cout << "Exporting results to " << path << endl;
     ofstream output_stream (path);
