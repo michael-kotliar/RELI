@@ -24,12 +24,15 @@ NullModel::NullModel(const string &path){
 }
 
 void NullModel::load(const string &path){
-    cout << "Loading null model from " << path << endl;
+    cout << endl <<"Loading null model from " << path << endl;
     ifstream input_stream(path);
     string line;
     while (getline(input_stream, line)){
         vector<string> values = split_by_delim(line);
         bin_map[atoi(values[1].c_str())].push_back(strtoul(values[0].c_str(), NULL, 0));
+    }
+    for (auto it = bin_map.begin(); it != bin_map.end(); ++it){
+        cout << it->first << ": " << it->second.size() << endl;
     }
     cout << "- done" << endl;
 }
@@ -62,7 +65,7 @@ BedData::BedData(const string &path){
 
 
 void BedData::make_index(){
-    cout << "Calculating index for bed data" << endl;
+    cout << endl << "Calculating index for bed data" << endl;
     string current_chr = bed_vector[0].chr;
     bed_index[current_chr] = 0;
     for (int i = 0; i < bed_vector.size(); i++){
