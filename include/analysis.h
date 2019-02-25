@@ -46,23 +46,25 @@ struct atgc{
 
 struct bed4{
     string chr;
-    int uid;
+    string name;
     unsigned long start;
     unsigned long end;
-    string name;
-    int bin;
     unsigned long length;
+
+    int uid;
+    int bin;
+
     inline bool operator<(const bed4& other) const {
         return (chr < other.chr || (chr == other.chr && start < other.start));
     }
     inline bed4():
             chr(""),
-            uid(0),
+            name(""),
             start(0),
             end(0),
-            name(""),
-            bin(0),
-            length(0){};
+            length(0),
+            uid(0),
+            bin(0){};
     bed4(const string &line);
     bed4(const bed4 &other_bed4);
 };

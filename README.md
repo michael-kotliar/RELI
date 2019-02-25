@@ -5,7 +5,7 @@ Params:
     --snp            SNP file
     --ld             LD file
     --target         Target interval file
-    --chr            Chromosome length file. Maybe it should be sorted
+    --chr            Chromosome length file. Should be sorted lexicographicaly (1, 10, 11 ... 19, 2, 20, 21 ... X, Y)
     --null           Null model file
     --dbsnp          SNP database file. Shouldn't have any header line
     --out            Output directory, default "./results"

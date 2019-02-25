@@ -39,9 +39,9 @@ void NullModel::load(const string &path){
 
 bed4::bed4(const bed4 &other_bed4){
     chr = other_bed4.chr;
+    name = other_bed4.name;
     start = other_bed4.start;
     end = other_bed4.end;
-    name = other_bed4.name;
     length = other_bed4.length;
     bin = other_bed4.bin;
     uid = other_bed4.uid;
@@ -79,15 +79,23 @@ void BedData::make_index(){
 
 
 void BedData::load(const string &path){
-    cout << "Loading bed data from " << path << endl;
+    cout << endl << "Loading bed data from " << path << endl;
     ifstream input_stream(path);
     string line;
     while (getline(input_stream, line)){
-        vector<string> values = split_by_delim(line);
         bed4 bed_data(line);
         bed_vector.push_back(bed_data);
     }
     sort(bed_vector.begin(), bed_vector.end());
+
+    set<string> uniq_chr_set;
+    for (int i = 0; i < bed_vector.size(); i++){
+        if (uniq_chr_set.find(bed_vector[i].chr) == uniq_chr_set.end()){
+            cout << bed_vector[i].chr << endl;
+            uniq_chr_set.insert(bed_vector[i].chr);
+        }
+    }
+
     vector<unsigned long> length_vector;
     for (int i = 0; i < bed_vector.size(); i++){
         bed_vector[i].uid = i;
@@ -119,7 +127,7 @@ genomelengthsum get_genome_length_sum(const genomelength &genome_structure){
     genomelengthsum genome_length_sum;
     genome_length_sum.push_back(0);
     cout << setw(27) << " | " << genome_length_sum.back() << endl;
-    for (int i = 0; i < 10; i++){
+    for (int i = 0; i < genome_structure.size(); i++){
         genome_length_sum.push_back(genome_length_sum.back() + genome_structure[i].second);
         cout << setw(5) << genome_structure[i].first << ": " << setw(10) << genome_structure[i].second << setw(10) << " | " << genome_length_sum.back() << endl;
     }
