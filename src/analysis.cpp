@@ -116,7 +116,7 @@ genomelengthsum get_genome_length_sum(const genomelength &genome_structure){
     genomelengthsum genome_length_sum;
     genome_length_sum.push_back(0);
     cout << setw(27) << " | " << genome_length_sum.back() << endl;
-    for (int i = 0; i < genome_structure.size(); i++){
+    for (int i = 0; i < 10; i++){
         genome_length_sum.push_back(genome_length_sum.back() + genome_structure[i].second);
         cout << setw(5) << genome_structure[i].first << ": " << setw(10) << genome_structure[i].second << setw(10) << " | " << genome_length_sum.back() << endl;
     }
@@ -130,9 +130,17 @@ snptable get_snp_table(const string &path){
     snptable snp_table;
     ifstream input_stream(path);
     string line;
+    int i = 0;
     while (getline(input_stream, line)){
-        snprecord snp_line(line);
-        snp_table[snp_line.rsid] = snp_line;
+        snprecord snp_record(line);
+        snp_table[snp_record.rsid] = snp_record;
+        if (i < 10){
+            cout << setw(15) << snp_record.rsid
+                 << ": " << setw(10) << snp_table[snp_record.rsid].chr
+                 << " "  << setw(10) << snp_table[snp_record.rsid].start
+                 << " "  << setw(10) << snp_table[snp_record.rsid].end << endl;
+            i++;
+        }
     };
     cout << "- done" << endl;
     return snp_table;

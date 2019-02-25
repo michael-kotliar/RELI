@@ -5,9 +5,9 @@ Params:
     --snp            SNP file
     --ld             LD file
     --target         Target interval file
-    --chr            Chromosome length file
+    --chr            Chromosome length file. Maybe it should be sorted
     --null           Null model file
-    --dbsnp          SNP database file
+    --dbsnp          SNP database file. Shouldn't have any header line
     --out            Output directory, default "./results"
     --prefix         Output file prefix, default "reli"
     --rep            Permutation number, default 2000
