@@ -20,27 +20,15 @@
 
 using namespace std;
 
-struct snpline {
+struct snprecord {
     string chr;
+    string rsid;
     unsigned long start;
     unsigned long end;
-    string rsid;
-    string obs_strand;
-    string ref_allele;
-    string alt_alleles;
-    string type;
-    vector<string> alt_allele_info;
-    vector<double> alt_allele_freq;
-    snpline(const string &line);
-    inline snpline():
-            chr(""),
-            start(0),
-            end(0),
-            rsid(""),
-            obs_strand(""),
-            ref_allele(""),
-            alt_alleles(""),
-            type("") {};
+    vector<double> alt_allele_freq;  // Need it only fro bin assignment
+
+    snprecord(const string &line);
+    inline snprecord(): chr(""), start(0), end(0), rsid(""){};
 };
 
 
@@ -118,7 +106,7 @@ struct statistics {
 typedef vector<pair<string, unsigned long> > genomelength;
 typedef vector<unsigned long> genomelengthsum;
 typedef vector<unsigned long> bin_vector;
-typedef unordered_map<string, snpline> snptable;
+typedef unordered_map<string, snprecord> snptable;
 typedef vector<int> hits;
 
 

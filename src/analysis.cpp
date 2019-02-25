@@ -5,17 +5,12 @@
 #include <analysis.h>
 
 
-snpline::snpline(const string &line){
+snprecord::snprecord(const string &line){
     vector<string> values = split_by_delim(line);
     chr = values[0];
     start = strtoul(values[1].c_str(), NULL, 0);
     end = strtoul(values[2].c_str(), NULL, 0);
     rsid = values[3];
-    obs_strand = values[4];
-    ref_allele = values[5];
-    alt_alleles = values[6];
-    type = values[7];
-    alt_allele_info = split_by_delim(values[8], ",");
     vector<string> alt_allele_freq_str = split_by_delim(values[9], ",");
     for (int i = 0; i < alt_allele_freq_str.size(); i++)
         alt_allele_freq.push_back(strtod(alt_allele_freq_str[i].c_str(), NULL));
@@ -136,7 +131,7 @@ snptable get_snp_table(const string &path){
     ifstream input_stream(path);
     string line;
     while (getline(input_stream, line)){
-        snpline snp_line(line);
+        snprecord snp_line(line);
         snp_table[snp_line.rsid] = snp_line;
     };
     cout << "- done" << endl;
