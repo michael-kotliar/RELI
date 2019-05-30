@@ -24,7 +24,7 @@ int main(int argc, char* argv[]){
     for (int i = 0; i < custom_parser.snps.size(); i++){
         string snp_file = custom_parser.snps[i];
         string ld_file = custom_parser.lds[i];
-        cout << "Process: " << endl << "   snp: " << snp_file << endl << "   ld: " << ld_file << endl;
+        cout << endl << "Process: " << endl << "   snp: " << snp_file << endl << "   ld: " << ld_file << endl;
         BedData snp_bed_data(snp_file);
         assign_bins(snp_bed_data, snp_table);
         lddata ld_data = get_ld_data(ld_file, snp_bed_data);

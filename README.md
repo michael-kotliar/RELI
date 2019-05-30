@@ -16,3 +16,7 @@ Params:
 
 
 Does the chromosome order in `--chr` file influence the results?
+
+`--chr`, `--dbsnp`, ` --null`, `--target`, `--snp`, `--ld` are not supposed to have any header 
+
+from `--ld` all `:` should be removed

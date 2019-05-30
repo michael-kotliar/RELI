@@ -34,7 +34,6 @@ void NullModel::load(const string &path){
     for (auto it = bin_map.begin(); it != bin_map.end(); ++it){
         cout << it->first << ": " << it->second.size() << endl;
     }
-    cout << "- done" << endl;
 }
 
 bed4::bed4(const bed4 &other_bed4){
@@ -74,7 +73,10 @@ void BedData::make_index(){
             bed_index[current_chr] = i;
         }
     }
-    cout << "- done" << endl;
+    
+    for (auto &bed_index_it : bed_index){
+        cout << setw(5) << bed_index_it.first << ": " << setw(10) << bed_index_it.second << endl;
+    }
 }
 
 
@@ -86,6 +88,8 @@ void BedData::load(const string &path){
         bed4 bed_data(line);
         bed_vector.push_back(bed_data);
     }
+
+    cout << endl << "Sorting" << endl << endl;
     sort(bed_vector.begin(), bed_vector.end());
 
     set<string> uniq_chr_set;
@@ -103,27 +107,34 @@ void BedData::load(const string &path){
     }
     sort(length_vector.begin(), length_vector.end());
     median_length = length_vector[floor(length_vector.size() / 2)];
-    cout << "- done" << endl;
 }
 
 
 genomelength get_genome_length(const string &path){
-    cout << "Loading genome length from " << path << endl;
+    cout << endl << "Loading genome length from " << path << endl << endl;
     ifstream input_stream(path);
     genomelength genome_length;
     string line;
     while(getline(input_stream, line)) {
         vector<string> values = split_by_delim(line);
         pair<string, unsigned long> chr_data (values[0], strtoul(values[1].c_str(), NULL, 0));
+        cout << setw(5) << chr_data.first << ": " << setw(10) << chr_data.second << endl;
         genome_length.push_back(chr_data);
     }
-    cout << "- done" << endl;
+    
+    cout << endl << "Sorting" << endl << endl;
+    sort(genome_length.begin(), genome_length.end());
+    
+    for (int i = 0; i < genome_length.size(); i++){
+        cout << setw(5) << genome_length[i].first << ": " << setw(10) << genome_length[i].second << endl;
+    }
+
     return genome_length;
 }
 
 
 genomelengthsum get_genome_length_sum(const genomelength &genome_structure){
-    cout << "Calculating genome length sum" << endl;
+    cout << endl << "Calculating genome length sum" << endl << endl;
     genomelengthsum genome_length_sum;
     genome_length_sum.push_back(0);
     cout << setw(27) << " | " << genome_length_sum.back() << endl;
@@ -131,13 +142,12 @@ genomelengthsum get_genome_length_sum(const genomelength &genome_structure){
         genome_length_sum.push_back(genome_length_sum.back() + genome_structure[i].second);
         cout << setw(5) << genome_structure[i].first << ": " << setw(10) << genome_structure[i].second << setw(10) << " | " << genome_length_sum.back() << endl;
     }
-    cout << "- done" << endl;
     return genome_length_sum;
 }
 
 
 snptable get_snp_table(const string &path){
-    cout << "Loading snp table from" << path << endl;
+    cout << endl << "Loading snp table from" << path << endl << endl;
     snptable snp_table;
     ifstream input_stream(path);
     string line;
@@ -147,29 +157,32 @@ snptable get_snp_table(const string &path){
         snp_table[snp_record.rsid] = snp_record;
         if (i < 10){
             cout << setw(15) << snp_record.rsid
-                 << ": " << setw(10) << snp_table[snp_record.rsid].chr
-                 << " "  << setw(10) << snp_table[snp_record.rsid].start
-                 << " "  << setw(10) << snp_table[snp_record.rsid].end << endl;
+                 << ": "  << setw(10) << snp_table[snp_record.rsid].chr
+                 << " "   << setw(10) << snp_table[snp_record.rsid].start
+                 << " "   << setw(10) << snp_table[snp_record.rsid].end
+                 << " | " << setw(10);
+            for (int j = 0; j < snp_table[snp_record.rsid].alt_allele_freq.size(); j++){
+                cout << " " << setw(10) << snp_table[snp_record.rsid].alt_allele_freq[j];
+            }
+            cout << endl;
             i++;
         }
     };
-    cout << "- done" << endl;
     return snp_table;
 }
 
 
 void assign_bins(BedData &snp_bed_data, const snptable &snp_table){
-    cout << "Assigning bins" << endl;
+    cout << endl << "Assigning bins" << endl << endl;
     atgc atgcmap;
     for (auto &bed4_line_it : snp_bed_data.bed_vector){
         auto snp_table_line_iter = snp_table.find(bed4_line_it.name);  // What to do with the snp that are not present in snp_table
         if (snp_table_line_iter != snp_table.end()) {
             vector<double> alt_allele_freq = snp_table_line_iter->second.alt_allele_freq;
             sort(alt_allele_freq.begin(), alt_allele_freq.end());
-            bed4_line_it.bin = get_bin(alt_allele_freq.back());
+            bed4_line_it.bin = get_bin(alt_allele_freq[alt_allele_freq.size() - 2]); // second from the last item
         }
     }
-    cout << " - done" << endl;
 }
 
 
@@ -179,7 +192,7 @@ thesamesnp::thesamesnp(const string& snp_id){
 
 
 lddata get_ld_data(const string &path, const BedData &snp_bed_data){
-    cout << "Loading LD data from " << path << endl;
+    cout << endl << "Loading LD data from " << path << endl << endl;
     lddata ld_data;
 
     ifstream input_stream(path);
@@ -190,30 +203,60 @@ lddata get_ld_data(const string &path, const BedData &snp_bed_data){
         ld_raw_data[values[0]] = vector<string>(++values.begin(), values.end());
     };
 
-    for (int i = 0; i < snp_bed_data.bed_vector.size(); i++){
-        LdRecord ld_record;
-        ld_record.key_snp = snp_bed_data.bed_vector[i];
-        auto ld_raw_data_iter = ld_raw_data.find(snp_bed_data.bed_vector[i].name);
-        if (ld_raw_data_iter != ld_raw_data.end()){
-            for (int j = 0; j < ld_raw_data_iter->second.size(); j++){
-                auto snp_bed_data_bed_vector_iter = find_if(snp_bed_data.bed_vector.begin(), snp_bed_data.bed_vector.end(), thesamesnp(ld_raw_data_iter->second[j]));
-                if (snp_bed_data_bed_vector_iter != snp_bed_data.bed_vector.end()){
-                    ld_record.bed_vector.push_back(*snp_bed_data_bed_vector_iter);
-                }
-            }
+
+    for (auto &ld_raw_data_it : ld_raw_data){
+        cout << setw(5) << ld_raw_data_it.first << ": ";
+        for (int i = 0; i <  ld_raw_data_it.second.size(); i++){
+            cout << setw(20) << ld_raw_data_it.second[i];
         }
-        if (ld_record.bed_vector.size() == 0){
-            ld_record.bed_vector.push_back(ld_record.key_snp);
+        cout << endl;
+
+        LdRecord ld_record;
+        ld_record.key_snp = *find_if(snp_bed_data.bed_vector.begin(), snp_bed_data.bed_vector.end(), thesamesnp(ld_raw_data_it.first));
+        for (int j = 0; j < ld_raw_data_it.second.size(); j++){
+            auto snp_bed_data_bed_vector_iter = find_if(snp_bed_data.bed_vector.begin(), snp_bed_data.bed_vector.end(), thesamesnp(ld_raw_data_it.second[j]));
+            if (snp_bed_data_bed_vector_iter != snp_bed_data.bed_vector.end()){
+                ld_record.bed_vector.push_back(*snp_bed_data_bed_vector_iter);
+            } else {
+                ld_record.bed_vector.push_back(ld_record.key_snp);  // looks like bypass. It should never happen if LD was generated based on SNP properly
+            }
         }
         ld_data.push_back(ld_record);
     }
+
+    // for (int i = 0; i < snp_bed_data.bed_vector.size(); i++){
+    //     LdRecord ld_record;
+    //     ld_record.key_snp = snp_bed_data.bed_vector[i];
+    //     auto ld_raw_data_iter = ld_raw_data.find(ld_record.key_snp.name);
+    //     if (ld_raw_data_iter != ld_raw_data.end()){
+    //         for (int j = 0; j < ld_raw_data_iter->second.size(); j++){
+    //             auto snp_bed_data_bed_vector_iter = find_if(snp_bed_data.bed_vector.begin(), snp_bed_data.bed_vector.end(), thesamesnp(ld_raw_data_iter->second[j]));
+    //             if (snp_bed_data_bed_vector_iter != snp_bed_data.bed_vector.end()){
+    //                 ld_record.bed_vector.push_back(*snp_bed_data_bed_vector_iter);
+    //             }
+    //         }
+    //     }
+    //     if (ld_record.bed_vector.size() == 0){
+    //         ld_record.bed_vector.push_back(ld_record.key_snp);
+    //     }
+    //     ld_data.push_back(ld_record);
+    // }
 
     for (int i = 0; i < ld_data.size(); i++){
         for (int j = 0; j < ld_data[i].bed_vector.size(); j++){
             ld_data[i].distance_to_key_snp.push_back(ld_data[i].bed_vector[j].end - ld_data[i].key_snp.end);
         }
     }
-    cout << "- done" << endl;
+    
+    cout << endl << "Calculated distances to SNPs from SNP file" << endl << endl;
+    for (int i = 0; i < ld_data.size(); i++){
+        cout << setw(5) << ld_data[i].key_snp.name << ": ";
+        for (int j = 0; j <  ld_data[i].distance_to_key_snp.size(); j++){
+            cout << setw(10) << ld_data[i].distance_to_key_snp[j];
+        }
+        cout << endl;
+    }
+
     return ld_data;
 }
 
@@ -296,11 +339,11 @@ set<int> get_unique_overlaps(vector<bed4> temp_snp_vector, const BedData &target
 
 
 hits sim(int permutation, const lddata &ld_data, const NullModel &null_model, const genomelength &genome_structure, const genomelengthsum &genome_sum, const BedData &target_bed_data){
-    cout << "Running simulation" << endl;
+    cout << endl << "Running simulation" << endl << endl;
     hits collected_hits;
     default_random_engine random_seed(chrono::system_clock::now().time_since_epoch().count());
     for (int current_iteration = 0; current_iteration < permutation; current_iteration++){
-//        cout << "   " << current_iteration + 1 << "/" << permutation << endl;
+        cout << "   " << current_iteration + 1 << "/" << permutation << endl;
         lddata simulation_ld_data;
         if (current_iteration == 0){
             simulation_ld_data = ld_data;
@@ -334,7 +377,6 @@ hits sim(int permutation, const lddata &ld_data, const NullModel &null_model, co
         set<int> unique_uid_collector = get_unique_overlaps(temp_snp_vector, target_bed_data);
         collected_hits.push_back(unique_uid_collector.size());
     }
-    cout << "- done" << endl;
     return collected_hits;
 }
 
@@ -343,28 +385,28 @@ statistics get_statistics(const hits &collected_hits, const lddata &ld_data, con
     statistics stats;
 
     for (int i = 0; i < collected_hits.size(); i++) {
-        stats.mean = stats.mean + collected_hits[i];
+        stats.mean = double(stats.mean) + double(collected_hits[i]);
     }
-    stats.mean = stats.mean / double(collected_hits.size());
+    stats.mean = double(stats.mean) / double(collected_hits.size());
 
     double temp = 0;
     for (int i = 0; i < collected_hits.size(); i++) {
-        temp += pow((collected_hits[i] - stats.mean), 2);
+        temp += pow((double(collected_hits[i]) - double(stats.mean)), 2);
     }
-    stats.std = sqrt(temp / double(collected_hits.size() - 1));
+    stats.std = sqrt(double(temp) / double(collected_hits.size() - 1));
 
-    if (stats.std != 0 && collected_hits[0] >= ceil(double(ld_data.size()) * sig_pct)) {
-        stats.zscore = (collected_hits[0] - stats.mean) / stats.std;
+    if (stats.std != 0 && collected_hits[0] >= ceil(double(ld_data.size()) * double(sig_pct))) {
+        stats.zscore = (double(collected_hits[0]) - double(stats.mean)) / double(stats.std);
     }
 
-    stats.pval = gsl_cdf_ugaussian_Q(stats.zscore);
-    stats.corrected_pval = min(stats.pval * corr_coef, 1.0);
-    stats.intersect = collected_hits[0];
-    stats.total = ld_data.size();
-    stats.ratio = stats.intersect / stats.total;
+    stats.pval = double(gsl_cdf_ugaussian_Q(double(stats.zscore)));
+    stats.corrected_pval = min(double(stats.pval) * double(corr_coef), 1.0);
+    stats.intersect = double(collected_hits[0]);
+    stats.total = double(ld_data.size());
+    stats.ratio = double(stats.intersect) / double(stats.total);
     stats.source = snp_file;
     if (stats.mean != 0){
-        stats.relative_risk = stats.intersect / stats.mean;
+        stats.relative_risk = double(stats.intersect) / double(stats.mean);
     }
 
     return stats;
@@ -401,5 +443,4 @@ void export_results(const vector<statistics> &collected_statistics, const string
             << collected_statistics[i].source << endl;
     }
     output_stream.close();
-    cout << " - done" << endl;
 }
